@@ -35,23 +35,23 @@ managedNodeGroups:
         efs: true
         cloudWatch: true
 
-  # - name: spot-ng
-  #   instanceType: t3.medium
-  #   desiredCapacity: 2
-  #   minSize: 1
-  #   maxSize: 3
-  #   volumeSize: 20
-  #   privateNetworking: true
-  #   spot: true               # Spot 인스턴스 사용
-  #   labels:
-  #     node-type: spot
-  #   iam:
-  #     withAddonPolicies:
-  #       albIngress: true
-  #       autoScaler: true
-  #       ebs: true
-  #       efs: true
-  #       cloudWatch: true
+  - name: spot-ng
+    instanceType: t3.medium
+    desiredCapacity: 2
+    minSize: 1
+    maxSize: 3
+    volumeSize: 20
+    privateNetworking: true
+    spot: true               # Spot 인스턴스 사용
+    labels:
+      node-type: spot
+    iam:
+      withAddonPolicies:
+        albIngress: true
+        autoScaler: true
+        ebs: true
+        efs: true
+        cloudWatch: true
  
 addons:
   - name: aws-ebs-csi-driver
