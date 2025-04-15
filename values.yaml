@@ -1,0 +1,98 @@
+init:
+  loadExamples: true
+
+bootstrapScript: |
+  #!/bin/sh
+
+  set -e
+
+  echo "[bootstrap] Installing system dependencies..."
+  apt-get update && apt-get install -y \
+    python3-dev \
+    default-libmysqlclient-dev \
+    build-essential \
+    pkg-config \
+    libmariadb-dev
+
+  echo "[bootstrap] Installing Python dependencies..."
+  pip install --no-cache-dir \
+    authlib \
+    psycopg2-binary \
+    mysqlclient \
+    sqlalchemy-redshift
+
+  echo "[bootstrap] Running DB migrations..."
+  superset db upgrade
+
+  echo "[bootstrap] Creating admin user..."
+  superset fab create-admin \
+    --username admin \
+    --firstname Superset \
+    --lastname Admin \
+    --email admin@example.com \
+    --password admin
+
+  echo "[bootstrap] Initializing Superset..."
+  superset init
+
+  echo "[bootstrap] DONE"
+
+
+
+configOverrides:
+  secret: |
+    SECRET_KEY = 'mcOPDyevZfvimzNF5HbrxBsf/s7CVKdclGnXMq+INaji2n+VbCAzUR2J'
+
+# ✅ Superset Web Pod: 온디맨드 노드에만 배포
+supersetNodeSelector:
+  node-type: ondemand
+
+supersetTolerations:
+  - key: "dedicated"
+    operator: "Equal"
+    value: "ondemand"
+    effect: "NoSchedule"
+
+supersetAffinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node-type
+              operator: In
+              values:
+                - ondemand
+
+# ✅ Superset Web의 PVC (gp3 + 온디맨드 노드 전용)
+persistence:
+  enabled: true
+  storageClass: gp3
+  accessMode: ReadWriteOnce
+  size: 10Gi
+
+# ✅ PostgreSQL 설정 (데이터 PVC도 온디맨드에만)
+postgresql:
+  postgresqlPassword: supersetPw
+  primary:
+    persistence:
+      enabled: true
+      storageClass: gp3
+
+    nodeSelector:
+      node-type: ondemand
+
+    tolerations:
+      - key: "dedicated"
+        operator: "Equal"
+        value: "ondemand"
+        effect: "NoSchedule"
+
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: node-type
+                  operator: In
+                  values:
+                    - ondemand

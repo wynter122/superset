@@ -1,0 +1,18 @@
+# 주석은 # 으로 작성합니다
+
+# 특정 파일 무시
+secret.txt
+.DS_Store
+
+# 특정 확장자 무시
+
+# 특정 폴더 무시
+.venv/
+__pycache__
+
+# 폴더 안의 모든 파일은 무시하지만, 특정 파일은 추적
+# data/*
+# !data/README.md
+
+# 루트 경로 기준으로 무시 (슬래시로 시작)
+# /config.json → 루트에 있는 config.json만 무시

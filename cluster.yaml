@@ -1,0 +1,60 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+ 
+metadata:
+  name: wynter-superset
+  region: ap-northeast-2
+  version: "1.31"
+ 
+vpc:
+  cidr: "10.10.0.0/16"
+  clusterEndpoints:
+    publicAccess: true
+    privateAccess: false
+ 
+managedNodeGroups:
+  - name: ondemand-ng
+    instanceType: t3.large
+    desiredCapacity: 1
+    minSize: 1
+    maxSize: 2
+    volumeSize: 30
+    privateNetworking: false
+    availabilityZones: ["ap-northeast-2b"]
+    labels:
+      node-type: ondemand
+    taints:
+      - key: "dedicated"
+        value: "ondemand"
+        effect: "NoSchedule"
+    iam:
+      withAddonPolicies:
+        albIngress: true
+        autoScaler: true
+        ebs: true
+        efs: true
+        cloudWatch: true
+
+  # - name: spot-ng
+  #   instanceType: t3.medium
+  #   desiredCapacity: 2
+  #   minSize: 1
+  #   maxSize: 3
+  #   volumeSize: 20
+  #   privateNetworking: true
+  #   spot: true               # Spot 인스턴스 사용
+  #   labels:
+  #     node-type: spot
+  #   iam:
+  #     withAddonPolicies:
+  #       albIngress: true
+  #       autoScaler: true
+  #       ebs: true
+  #       efs: true
+  #       cloudWatch: true
+ 
+addons:
+  - name: aws-ebs-csi-driver
+    version: latest
+    wellKnownPolicies:
+      ebsCSIController: true
