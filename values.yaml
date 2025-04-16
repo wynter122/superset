@@ -1,5 +1,5 @@
 init:
-  loadExamples: true
+  loadExamples: false
 
 bootstrapScript: |
   #!/bin/sh
@@ -42,6 +42,9 @@ bootstrapScript: |
 configOverrides:
   secret: |
     SECRET_KEY = 'mcOPDyevZfvimzNF5HbrxBsf/s7CVKdclGnXMq+INaji2n+VbCAzUR2J'
+  extend_timeout: |
+    SUPERSET_WEBSERVER_TIMEOUT = 600
+
 
 # ✅ Superset Web Pod: 온디맨드 노드에만 배포
 supersetNodeSelector:
